@@ -20,8 +20,6 @@ export async function GetSchema(request: HttpRequest, context: InvocationContext
 
     const authHeader = request.headers.get('authorization');
     const user = await verifyFirebaseToken(authHeader);
-    console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
-    console.log(user)
     const uid = user.uid;
 
     const result = await container.items

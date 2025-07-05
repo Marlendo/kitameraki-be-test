@@ -21,6 +21,7 @@ export async function verifyFirebaseToken(authHeader: string | null) {
         const decoded = await admin.auth().verifyIdToken(idToken);
         return decoded; // berisi uid, email, dll.
     } catch (err) {
+        console.log(err)
         throw new Error('Invalid Token');
     }
 }
