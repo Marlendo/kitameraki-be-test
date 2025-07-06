@@ -1,16 +1,13 @@
 import * as admin from 'firebase-admin';
-
-if (!admin.apps.length) {
-    admin.initializeApp({
-        credential: admin.credential.cert({
-            projectId: process.env.FIREBASE_PROJECT_ID,
-            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        }),
-    });
-}
+import serviceAccount from './config.json'
 
 export async function verifyFirebaseToken(authHeader: string | null) {
+    if (!admin.apps.length) {
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount as any)
+        });
+    }
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         throw new Error('Unauthorized');
     }
@@ -19,9 +16,9 @@ export async function verifyFirebaseToken(authHeader: string | null) {
 
     try {
         const decoded = await admin.auth().verifyIdToken(idToken);
-        return decoded; // berisi uid, email, dll.
+        return decoded;
     } catch (err) {
-        console.log(err)
+        console.log(err);
         throw new Error('Invalid Token');
     }
 }

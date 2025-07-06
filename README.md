@@ -1,20 +1,35 @@
 # ⚡ Azure Function Local Development
 
-## Prerequisites
+## 🌐 Live Demo Endpoints
 
-Make sure you have the following installed:
+The following public Azure Function endpoints are available for demo and testing purposes:
+
+- [CreateOrUpdateSchema](https://erick-kitameraki-test-f4bnabcddud4bkbp.indonesiacentral-01.azurewebsites.net/api/createorupdateschema)
+- [DeleteTask](https://erick-kitameraki-test-f4bnabcddud4bkbp.indonesiacentral-01.azurewebsites.net/api/deletetask)
+- [GetSchema](https://erick-kitameraki-test-f4bnabcddud4bkbp.indonesiacentral-01.azurewebsites.net/api/getschema)
+- [GetTasks](https://erick-kitameraki-test-f4bnabcddud4bkbp.indonesiacentral-01.azurewebsites.net/api/gettasks)
+- [InsertTask](https://erick-kitameraki-test-f4bnabcddud4bkbp.indonesiacentral-01.azurewebsites.net/api/inserttask)
+- [UpdateTask](https://erick-kitameraki-test-f4bnabcddud4bkbp.indonesiacentral-01.azurewebsites.net/api/updatetask)
+
+Feel free to test them using Postman, cURL, or directly from your frontend.
+
+---
+
+## 🧰 Prerequisites
+
+Make sure the following tools are installed on your system:
 
 - [Node.js](https://nodejs.org/)
 - [Azure Functions Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local#install-the-azure-functions-core-tools)
 - [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) *(optional)*
-- [Docker](https://www.docker.com/) *(optional, if you use services like Cosmos DB emulator)*
-- VS Code + Azure Functions Extension *(optional but recommended)*
+- [Docker](https://www.docker.com/) *(optional – useful for services like Cosmos DB emulator)*
+- Visual Studio Code with Azure Functions Extension *(recommended)*
 
 ---
 
 ## 🚀 Running the Function App Locally
 
-1. **Clone this repository**
+1. **Clone the repository**
 
 ```bash
 git clone <YOUR_REPO_URL>
@@ -35,7 +50,7 @@ bun install
 cp local.settings.template.json local.settings.json
 ```
 
-> ⚠️ `local.settings.json` is ignored by Git. Fill it with your secret values (e.g., connection strings, API keys).
+> ⚠️ `local.settings.json` is excluded from version control. Populate it with your secrets (e.g., connection strings, API keys).
 
 4. **Start the function app**
 
@@ -43,7 +58,7 @@ cp local.settings.template.json local.settings.json
 func start
 ```
 
-If you're using TypeScript and need to compile:
+If using TypeScript and compilation is needed:
 
 ```bash
 npm run build
@@ -54,7 +69,7 @@ func start
 
 ## 🧪 Example Request
 
-Assuming you're testing `UpdateTask` function:
+Example cURL request for testing the `UpdateTask` function:
 
 ```bash
 curl -X POST http://localhost:7071/api/UpdateTask \
@@ -64,7 +79,7 @@ curl -X POST http://localhost:7071/api/UpdateTask \
 
 ---
 
-## 📁 Project Structure Example
+## 📁 Project Structure Overview
 
 ```bash
 .
@@ -72,17 +87,17 @@ curl -X POST http://localhost:7071/api/UpdateTask \
 │   └── UpdateTask/index.ts
 ├── shared/
 │   └── auth/
-├── local.settings.json       ← ignored (created from template)
-├── template.settings.json    ← settings template
+├── local.settings.json         ← ignored (generated from template)
+├── local.settings.template.json
 ├── package.json
 └── ...
 ```
 
 ---
 
-## 🛠 Bonus: Add Dev Script (Optional)
+## 🛠 Optional: Add Development Script
 
-You can add this to your `package.json` to auto-generate the local settings and start the app:
+To streamline local development, you can add this script to your `package.json`:
 
 ```json
 "scripts": {
@@ -94,9 +109,11 @@ You can add this to your `package.json` to auto-generate the local settings and 
 
 ## ✅ Tips
 
-- Do **not** commit `local.settings.json` — it contains sensitive data
-- Use `.env` or environment variable manager if you want advanced config
+- Do **not** commit `local.settings.json` — it contains sensitive credentials.
+- Use `.env` or environment variable managers for advanced secret management.
+- Use Azure Emulator for local testing (e.g., Cosmos DB, Storage) if needed.
 
 ---
 
-Best regard Erick Marlendo Noviyanto ⚡
+Best regards,  
+**Erick Marlendo Noviyanto** ⚡

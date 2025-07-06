@@ -1,6 +1,6 @@
 import { CosmosClient } from "@azure/cosmos";
 import { HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
-import { verifyFirebaseToken } from "../auth/auth";
+import { verifyFirebaseToken } from "../../firebase/auth";
 
 export async function GetTasks(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     const client = new CosmosClient(process.env.COSMOS_CONNECTION_STRING!);
