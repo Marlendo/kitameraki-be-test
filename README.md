@@ -99,4 +99,4 @@ You can add this to your `package.json` to auto-generate the local settings and 
 
 ---
 
-Happy coding ⚡
+Best regard Erick Marlendo Noviyanto ⚡
