@@ -6,6 +6,7 @@ import { CreateOrUpdateSchema } from './schema/CreateOrUpdateSchema';
 import { GetTasks } from './task/GetTasks';
 import { InsertTask } from './task/InsertTask';
 import { UpdateTask } from './task/UpdateTask';
+import { DeleteTask } from './task/DeleteTask';
 
 app.http('GetSchema', {
     methods: ['GET'],
@@ -35,4 +36,10 @@ app.http('UpdateTask', {
     methods: ['PUT'],
     authLevel: 'anonymous',
     handler: UpdateTask,
+});
+
+app.http('DeleteTask', {
+  methods: ['DELETE'],
+  authLevel: 'anonymous',
+  handler: DeleteTask,
 });
