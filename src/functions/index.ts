@@ -3,6 +3,10 @@ import { app } from '@azure/functions';
 import { GetSchema } from './schema/GetSchema';
 import { CreateOrUpdateSchema } from './schema/CreateOrUpdateSchema';
 
+import { GetTasks } from './task/GetTasks';
+import { InsertTask } from './task/InsertTask';
+import { UpdateTask } from './task/UpdateTask';
+
 app.http('GetSchema', {
     methods: ['GET'],
     authLevel: 'anonymous',
@@ -13,4 +17,22 @@ app.http('CreateOrUpdateSchema', {
     methods: ['POST'],
     authLevel: 'anonymous',
     handler: CreateOrUpdateSchema,
+});
+
+app.http('GetTasks', {
+    methods: ['POST'],
+    authLevel: 'anonymous',
+    handler: GetTasks
+});
+
+app.http('InsertTask', {
+    methods: ['POST'],
+    authLevel: 'anonymous',
+    handler: InsertTask
+});
+
+app.http('UpdateTask', {
+    methods: ['PUT'],
+    authLevel: 'anonymous',
+    handler: UpdateTask,
 });

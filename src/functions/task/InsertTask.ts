@@ -1,19 +1,57 @@
 import { CosmosClient } from "@azure/cosmos";
-import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
+import { HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
+import { verifyFirebaseToken } from "../auth/auth";
+import { v4 as uuidv4 } from 'uuid';
+
+const fixedFieldIds = ['title', 'status', 'due'];
 
 export async function InsertTask(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
-    const body = await request.json();
+    try {
+        const client = new CosmosClient(process.env.COSMOS_CONNECTION_STRING!);
+        const db = client.database("TaskApp");
+        const container = db.container("Tasks");
 
-    const client = new CosmosClient("this is a connection string");
-    const createdTask = await client.database("TaskApp")
-        .container("Tasks")
-        .items.create(body);
+        const authHeader = request.headers.get("authorization");
+        const user = await verifyFirebaseToken(authHeader);
+        const uid = user.uid;
 
-    return { jsonBody: createdTask.resource, status: 200 };
+        const body: any = await request.json();
+
+        if (typeof body !== "object" || Array.isArray(body)) {
+            return {
+                status: 400,
+                jsonBody: { error: "Invalid task format" },
+            };
+        }
+
+        const missingFields = fixedFieldIds.filter((field) => !(field in body));
+        if (missingFields.length > 0) {
+            return {
+                status: 400,
+                jsonBody: {
+                    error: `Missing required field(s): ${missingFields.join(', ')}`,
+                },
+            };
+        }
+
+        const task = {
+            ...body,
+            id: uuidv4(),
+            uid,
+            createdAt: new Date().toISOString(),
+        };
+
+        await container.items.create(task);
+
+        return {
+            status: 201,
+            jsonBody: {
+                message: "Field inserted successfully",
+                data: task,
+            },
+        };
+    } catch (error) {
+        context.error('Error:', error);
+        return { status: 500, jsonBody: { error: error.message || 'Internal Server Error' } };
+    }
 };
-
-app.http('InsertTask', {
-    methods: ['POST'],
-    authLevel: 'anonymous',
-    handler: InsertTask
-});

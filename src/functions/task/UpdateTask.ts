@@ -1,33 +1,77 @@
 import { CosmosClient } from "@azure/cosmos";
-import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
+import { HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
+import { verifyFirebaseToken } from "../auth/auth";
 
+const fixedFieldIds = ['id', 'title', 'status', 'due'];
 
 export async function UpdateTask(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
-    const body = await request.json() as object;
-    const taskId = request.query.get('id');
-    const organizationId = request.query.get('organizationId');
+  try {
+    const client = new CosmosClient(process.env.COSMOS_CONNECTION_STRING!);
+    const db = client.database("TaskApp");
+    const container = db.container("Tasks");
 
-    let patchRequests = [];
+    const authHeader = request.headers.get("authorization");
+    const user = await verifyFirebaseToken(authHeader);
+    const uid = user.uid;
 
-    for (let key in body) {
-        patchRequests.push({
-            "op": "replace",
-            "path": `/${key}`,
-            "value": body[key]
-        });
+    const body: any = await request.json();
+
+    if (typeof body !== "object" || Array.isArray(body)) {
+      return {
+        status: 400,
+        jsonBody: { error: "Invalid task format" },
+      };
     }
 
-    const client = new CosmosClient("this is a connection string");
-    const createdTask = await client.database("TaskApp")
-        .container("Tasks")
-        .item(taskId, organizationId)
-        .patch(patchRequests);
+    const missingFields = fixedFieldIds.filter((field) => !(field in body));
+    if (missingFields.length > 0) {
+      return {
+        status: 400,
+        jsonBody: {
+          error: `Missing required field(s): ${missingFields.join(', ')}`,
+        },
+      };
+    }
 
-    return { jsonBody: createdTask.resource, status: 200 };
-};
+    const taskId = body.id;
 
-app.http('UpdateTask', {
-    methods: ['POST'],
-    authLevel: 'anonymous',
-    handler: UpdateTask
-});
+    // 🔍 Cek apakah task exist dan milik user
+    const { resources } = await container.items
+      .query({
+        query: `SELECT * FROM c WHERE c.id = @id AND c.uid = @uid`,
+        parameters: [
+          { name: "@id", value: taskId },
+          { name: "@uid", value: uid },
+        ],
+      })
+      .fetchAll();
+
+    if (resources.length === 0) {
+      return {
+        status: 404,
+        jsonBody: { error: "Task not found or unauthorized" },
+      };
+    }
+
+    const existingTask = resources[0];
+
+    const updatedTask = {
+      ...existingTask,
+      ...body,
+      updatedAt: new Date().toISOString(),
+    };
+
+    await container.item(taskId, uid).replace(updatedTask);
+
+    return {
+      status: 200,
+      jsonBody: {
+        message: "Task updated successfully",
+        data: updatedTask,
+      },
+    };
+  } catch (error) {
+    context.error("Error:", error);
+    return { status: 500, jsonBody: { error: error.message || "Internal Server Error" } };
+  }
+}
