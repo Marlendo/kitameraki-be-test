@@ -3,7 +3,8 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "node",
-    "COSMOS_CONNECTION_STRING": "COSMOS_CONNECTION_STRING"
+    "COSMOS_CONNECTION_STRING": "COSMOS_CONNECTION_STRING",
+    "FIREBASE_SERVICE_ACCOUNT": "FIREBASE_SERVICE_ACCOUNT"
   },
   "Host": {
     "LocalHttpPort": 7071,
